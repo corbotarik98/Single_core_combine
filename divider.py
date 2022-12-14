@@ -2,6 +2,8 @@ import time
 from multiprocessing import Process, Queue
 import os
 
+n_cores = 2
+
 
 def multi_div(list_times, core):
     os.system("mkdir "+str(core))
@@ -57,3 +59,13 @@ def main(n_cores):
         p.join()
 
     return (cores, chunked_list)
+
+
+a = main(n_cores)
+
+os.system("rm Progress")
+
+f = open("Progress", "a")
+f.write(str(a[0])+"\n")
+f.write('[]'+"\n")
+f.close()

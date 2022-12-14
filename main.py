@@ -1,4 +1,4 @@
-import divider
+
 import combine_single
 import combine_final
 import time
@@ -21,6 +21,7 @@ if __name__ == "__main__":
     completed_cores = []
 
     done = False
+    stop = False
 
     try:
 
@@ -40,19 +41,22 @@ if __name__ == "__main__":
 
         cores = progress[0]
 
-        progress[1] = progress[1].split(",")
-        progress[1][0] = progress[1][0].strip("[")
-        progress[1][-1] = progress[1][-1].replace("']", '')
-        progress[1][-1] = progress[1][-1].strip("\n")
+        if "core" not in progress[1]:
+            completed_cores = completed_cores
 
-        for i in range(len(progress[1])):
-            progress[1][i] = progress[1][i].strip("'")
-            progress[1][i] = progress[1][i].replace(" ", '')
-            progress[1][i] = progress[1][i].replace("'", '')
+        else:
 
-        completed_cores = progress[1]
+            progress[1] = progress[1].split(",")
+            progress[1][0] = progress[1][0].strip("[")
+            progress[1][-1] = progress[1][-1].replace("']", '')
+            progress[1][-1] = progress[1][-1].strip("\n")
 
-        f.close()
+            for i in range(len(progress[1])):
+                progress[1][i] = progress[1][i].strip("'")
+                progress[1][i] = progress[1][i].replace(" ", '')
+                progress[1][i] = progress[1][i].replace("'", '')
+
+            completed_cores = progress[1]
 
         try:
             if "done" in progress[2]:
@@ -61,52 +65,52 @@ if __name__ == "__main__":
         except:
             done = done
 
+        f.close()
+
     except:
 
-        print("DIVIDING")
+        print("ERROR NOT DIVIDED FIRST. RUN DIVIDER.PY!")
+        stop = True
 
-        print("================")
-        print("================")
+    if not stop:
+        print("")
+        print("")
 
-        division = divider.main(divisions)
+        for core in cores:
 
-        cores = division[0]
+            if core not in completed_cores:
+                print("")
+                print("")
 
-    print("")
-    print("")
+                print("COMBINING")
 
-    print("COMBINING")
+                print("================")
+                print("================")
+                combine_single.main(core)
+                completed_cores.append(core)
+                os.system("rm Progress")
+                f = open("Progress", "a")
+                f.write(str(cores)+"\n")
+                f.write(str(completed_cores)+"\n")
+                f.close()
 
-    print("================")
-    print("================")
+        timei = time.time()
 
-    for core in cores:
-        if core not in completed_cores:
-            combine_single.main(core)
-            completed_cores.append(core)
-            os.system("rm Progress")
+        delta = timei - time0
+
+        if delta >= 20*60*60 and cluster:
+            a = 0
+
+        elif not done:
+
+            print("")
+            print("")
+
+            print("FINAL COMBINING")
+
+            print("================")
+            print("================")
+            combine_final.main(divisions)
+
             f = open("Progress", "a")
-            f.write(str(cores)+"\n")
-            f.write(str(completed_cores)+"\n")
-            f.close()
-
-    timei = time.time()
-
-    delta = timei - time0
-
-    if delta >= 20*60*60 and cluster:
-        a = 0
-
-    elif not done:
-
-        print("")
-        print("")
-
-        print("FINAL COMBINING")
-
-        print("================")
-        print("================")
-        combine_final.main(divisions)
-
-        f = open("Progress", "a")
-        f.write("done"+"\n")
+            f.write("done"+"\n")
